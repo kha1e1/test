@@ -1,0 +1,3 @@
+
+class JobTime:
+    pass

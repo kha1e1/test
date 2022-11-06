@@ -1,0 +1,45 @@
+version: "3.3"
+
+
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: barber
+      MYSQL_DATABASE: reserv_bot
+      MYSQL_USER: barber_user
+      MYSQL_PASSWORD: barber423423
+    networks:
+      - botnet
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+      - ./configuration/mysql/mysqld_charset.cnf:/var/lib/conf.d/custom.cnf
+
+  redis:
+    container_name: 'redis_barber'
+    image: redis:alpine
+    restart: always
+    networks:
+      - botnet
+    volumes:
+      - ./redis-data/redis:/var/lib/redis
+
+  bot_barber:
+    container_name: 'bot_container'
+    build:
+      context: .
+    command: python3 long_polling.py
+    restart: always
+    networks:
+      - botnet
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/src/app
+
+
+networks:
+  botnet:
+    driver: bridge
